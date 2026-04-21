@@ -51,8 +51,7 @@
     equipamentoSelecionado: '',
     subtipoSelecionado: '',
     horariosSelecionados: [],
-    horariosOcupados: new Set(),
-    ultimoPedido: null
+    horariosOcupados: new Set()
   };
 
   // ---------- Helpers ----------
@@ -129,12 +128,14 @@
   }
 
   function bindEventos() {
+    // Categorias
     $$('.categoria-card').forEach(btn => {
       btn.addEventListener('click', () => escolherCategoria(btn.dataset.categoria));
     });
 
     $('#btn-voltar').addEventListener('click', voltarInicio);
 
+    // Validação em tempo real
     $('#nome').addEventListener('blur', () => {
       const v = $('#nome').value.trim();
       setErro('nome', v.length < 3 ? 'Informe seu nome completo.' : '');
@@ -154,14 +155,17 @@
       else limparTabela('Selecione uma data válida.');
     });
 
+    // Detalhes
     $('#qtd-amostras').addEventListener('input', atualizarResumo);
     $('#obs-ensaio').addEventListener('input', atualizarResumo);
     $('#qtd-alunos').addEventListener('input', atualizarResumo);
 
+    // Subtipos
     $$('.btn-opcao').forEach(btn => {
       btn.addEventListener('click', () => definirSubtipo(btn.dataset.subtipo, btn));
     });
 
+    // Submit
     $('#form-agendamento').addEventListener('submit', (e) => {
       e.preventDefault();
       reservarSelecionados();
@@ -238,6 +242,8 @@
       });
     }
 
+    // Carrega a tabela de horários já com a data de hoje (ou a próxima útil),
+    // assim o usuário já vê os checkboxes para marcar.
     if (!$('#data').value) {
       const proxima = proximoDiaUtil();
       $('#data').value = proxima;
@@ -264,16 +270,8 @@
     state.ensaioSelecionado = '';
     state.subtipoSelecionado = '';
     state.horariosSelecionados = [];
-    state.ultimoPedido = null;
     $('#resumo-agendamento').hidden = true;
     $('#mensagem-feedback').hidden = true;
-
-    const areaAcao = $('#area-acao');
-    areaAcao.innerHTML = `
-      <button type="submit" id="btn-confirmar" class="btn-primario">
-        Confirmar Agendamento
-      </button>
-    `;
   }
 
   // ---------- Seleções ----------
@@ -329,6 +327,7 @@
     corpo.innerHTML = `<tr><td colspan="3" class="placeholder-horarios"><span class="spinner"></span>Carregando horários...</td></tr>`;
     statusEl.textContent = '';
 
+    // Em produção, aqui você consultaria o Apps Script para saber horários ocupados.
     let ocupados = new Set();
     try {
       // const r = await fetch(`${CONFIG.APPS_SCRIPT_URL}?acao=listar&data=${encodeURIComponent(data)}`);
@@ -411,6 +410,7 @@
 
   // ---------- Submit ----------
   function reservarSelecionados() {
+    // Validações
     const nome = $('#nome').value.trim();
     const email = $('#email').value.trim();
     const data = $('#data').value;
@@ -447,6 +447,7 @@
 
     if (temErro) return;
 
+    // Monta mensagem
     const ID_UNICO = 'ID-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8);
     const numeroDestino = CONFIG.CONTATOS[state.categoriaAtiva] || CONFIG.CONTATOS['CARACTERIZAÇÃO DE MATERIAIS'];
     const detalhes = $('#maquina').value;
@@ -466,99 +467,18 @@
 
     const urlZap = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensagem)}`;
 
-    state.ultimoPedido = {
-      id: ID_UNICO,
-      nome,
-      categoria: state.categoriaAtiva,
-      detalhes,
-      data: formatarData(data),
-      horarios: horarios.join(', '),
-      hora_envio: new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })
-    };
-
-    const janela = window.open(urlZap, '_blank', 'noopener');
-
-    if (!janela) {
-      const areaAcao = $('#area-acao');
-      areaAcao.innerHTML = `
-        <a href="${urlZap}" target="_blank" rel="noopener" class="btn-whatsapp" id="link-zap-manual">
-          <span aria-hidden="true">\uD83D\uDCF1</span> Abrir WhatsApp para enviar o pedido
-        </a>
-      `;
-      mostrarFeedback('Seu navegador bloqueou a janela. Clique no botão verde para abrir o WhatsApp e enviar o pedido.', 'erro');
-      $('#link-zap-manual').addEventListener('click', () => {
-        aguardarRetornoDoZap();
-      });
-    } else {
-      aguardarRetornoDoZap();
-    }
-
-    $('#resumo-agendamento').scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }
-
-  // ---------- Aguarda o retorno do usuário ----------
-  function aguardarRetornoDoZap() {
+    // Substitui o botão por um link de WhatsApp
     const areaAcao = $('#area-acao');
     areaAcao.innerHTML = `
-      <div class="aguardando-envio">
-        <div class="spinner-grande" aria-hidden="true"></div>
-        <p><strong>Aguardando você enviar a mensagem no WhatsApp...</strong></p>
-        <p class="aguardando-sub">Após enviar, volte a esta página para confirmar seu agendamento.</p>
-        <button type="button" class="btn-primario" id="btn-ja-enviei">
-          <span aria-hidden="true">\u2714</span> Já enviei a mensagem
-        </button>
-      </div>
+      <a href="${urlZap}" target="_blank" rel="noopener" class="btn-whatsapp">
+        <span aria-hidden="true">\uD83D\uDCF1</span> Enviar pedido via WhatsApp
+      </a>
+      <button type="button" class="btn-voltar" id="btn-novo-agendamento">Fazer outro agendamento</button>
     `;
-
-    $('#btn-ja-enviei').addEventListener('click', mostrarComprovante);
-
-    const handlerVisibilidade = () => {
-      if (document.visibilityState === 'visible') {
-        document.removeEventListener('visibilitychange', handlerVisibilidade);
-        setTimeout(() => {
-          const btn = $('#btn-ja-enviei');
-          if (btn) btn.classList.add('pulsar');
-        }, 400);
-      }
-    };
-    document.addEventListener('visibilitychange', handlerVisibilidade);
-  }
-
-  // ---------- Comprovante ----------
-  function mostrarComprovante() {
-    const p = state.ultimoPedido || {};
-    const areaAcao = $('#area-acao');
-    areaAcao.innerHTML = `
-      <div class="comprovante-envio">
-        <div class="comprovante-icone" aria-hidden="true">\u2714</div>
-        <h3>Pedido enviado com sucesso!</h3>
-        <p class="comprovante-sub">Seu pedido foi encaminhado ao responsável pelo WhatsApp.</p>
-
-        <div class="comprovante-dados">
-          <div><span>Protocolo</span><strong>${p.id || '—'}</strong></div>
-          <div><span>Solicitante</span><strong>${p.nome || '—'}</strong></div>
-          <div><span>Categoria</span><strong>${p.categoria || '—'}</strong></div>
-          <div><span>Detalhes</span><strong>${p.detalhes || '—'}</strong></div>
-          <div><span>Data</span><strong>${p.data || '—'}</strong></div>
-          <div><span>Horários</span><strong>${p.horarios || '—'}</strong></div>
-          <div><span>Enviado às</span><strong>${p.hora_envio || '—'}</strong></div>
-        </div>
-
-        <p class="comprovante-aviso">
-          \u26A0 O agendamento será <strong>confirmado oficialmente</strong> quando o responsável aceitar o pedido no WhatsApp.
-          Você receberá a confirmação pelos canais informados.
-        </p>
-
-        <button type="button" class="btn-primario" id="btn-novo-agendamento">
-          Fazer novo agendamento
-        </button>
-      </div>
-    `;
-
     $('#btn-novo-agendamento').addEventListener('click', voltarInicio);
-    $('#mensagem-feedback').hidden = true;
 
-    areaAcao.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    mostrarFeedback('Pedido pronto! Clique no botão verde para enviar pelo WhatsApp ao responsável.', 'sucesso');
+    $('#resumo-agendamento').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
 })();
