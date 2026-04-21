@@ -328,7 +328,6 @@
     statusEl.textContent = '';
 
     // Em produção, aqui você consultaria o Apps Script para saber horários ocupados.
-    // Por enquanto deixamos um stub seguro: se você implementar o endpoint, descomente abaixo.
     let ocupados = new Set();
     try {
       // const r = await fetch(`${CONFIG.APPS_SCRIPT_URL}?acao=listar&data=${encodeURIComponent(data)}`);
@@ -453,7 +452,7 @@
     const numeroDestino = CONFIG.CONTATOS[state.categoriaAtiva] || CONFIG.CONTATOS['CARACTERIZAÇÃO DE MATERIAIS'];
     const detalhes = $('#maquina').value;
 
-    let mensagem = '🔬 *Novo Agendamento LMP*\n\n';
+    let mensagem = '\uD83D\uDD2C *Novo Agendamento LMP*\n\n';
     mensagem += `*Nome:* ${nome}\n`;
     mensagem += `*E-mail:* ${email}\n`;
     if ($('#orientador').value) mensagem += `*Orientador:* ${$('#orientador').value}\n`;
@@ -463,8 +462,8 @@
     mensagem += `*Data:* ${formatarData(data)}\n`;
     mensagem += `*Horários:* ${horarios.join(', ')}\n\n`;
     mensagem += `*ID:* ${ID_UNICO}\n\n`;
-    mensagem += `✅ ACEITAR: ${CONFIG.APPS_SCRIPT_URL}?id=${ID_UNICO}&acao=Aceito\n`;
-    mensagem += `❌ RECUSAR: ${CONFIG.APPS_SCRIPT_URL}?id=${ID_UNICO}&acao=Recusado`;
+    mensagem += `\u2705 ACEITAR: ${CONFIG.APPS_SCRIPT_URL}?id=${ID_UNICO}&acao=Aceito\n`;
+    mensagem += `\u274C RECUSAR: ${CONFIG.APPS_SCRIPT_URL}?id=${ID_UNICO}&acao=Recusado`;
 
     const urlZap = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensagem)}`;
 
@@ -472,7 +471,7 @@
     const areaAcao = $('#area-acao');
     areaAcao.innerHTML = `
       <a href="${urlZap}" target="_blank" rel="noopener" class="btn-whatsapp">
-        <span aria-hidden="true">📱</span> Enviar pedido via WhatsApp
+        <span aria-hidden="true">\uD83D\uDCF1</span> Enviar pedido via WhatsApp
       </a>
       <button type="button" class="btn-voltar" id="btn-novo-agendamento">Fazer outro agendamento</button>
     `;
