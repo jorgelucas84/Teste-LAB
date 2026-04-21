@@ -23,6 +23,347 @@
   const cardsCaracterizacao = [
     { n: 'Dosagem Marshall', img: 'Marshall.jpeg', eq: 'Prensa Marshall, Estufas, Compactador' },
     { n: 'Dosagem Superpave', img: 'superpave.jpeg', eq: 'Compactador Giratório, Rice Test, Estufas' },
-    { n: 'Extração de ligante', img: 'rotarex.jpeg', eq: 'Rotarex ou Soxhlet' }, **...**
+    { n: 'Extração de ligante', img: 'rotarex.jpeg', eq: 'Rotarex ou Soxhlet' },
+    { n: 'Fluir ligante', img: 'fluir.jpeg', eq: 'Bucha de fluidez, Estufa' },
+    { n: 'Homogeneização', img: 'quarte.jpeg', eq: 'Quarteador, Bandejas' },
+    { n: 'Abrasão Los Angeles', img: 'la.jpeg', eq: 'Máquina Los Angeles' },
+    { n: 'Densidade e absorção', img: 'dens.jpeg', eq: 'Balança Hidrostática' },
+    { n: 'Adesividade (Tradicional)', img: 'adesiv.jpeg', eq: 'Placas de vidro, Estufa' },
+    { n: 'Adesividade (ABS)', img: 'abs.jpeg', eq: 'PAT Tester' },
+    { n: 'Granulometria', img: 'granu.jpeg', eq: 'Agitador de peneiras' },
+    { n: 'Indice de forma', img: 'if.jpeg', eq: 'Paquímetro, Agulha' },
+    { n: 'Sanidade', img: 'sani.jpeg', eq: 'Sulfato, Estufa' },
+    { n: 'Secagem / Estufa', img: 'estufa.jpeg', eq: 'Estufa de circulação' }
+  ];
 
-_This response is too long to display in full._
+  const cardsMecanicos = [
+    { n: 'Prensa Marshall', img: 'marsh.jpeg', eq: 'Rompimento Marshall / Estabilidade / Fluência' },
+    { n: 'Prensa UTM-25', img: 'utm25.jpeg', eq: 'Ensaios Dinâmicos, Fadiga de Misturas Asfálticas' },
+    { n: 'Prensa UTM-30', img: 'utm30.jpeg', eq: 'Módulo de Resiliência, Resistência à Tração (RT)' },
+    { n: 'Prensa MTS', img: 'mts.jpeg', eq: 'Ensaios de Alta Precisão e Caracterização Avançada' },
+    { n: 'Prensa RiO', img: 'rio.jpeg', eq: 'Ensaios de Compressão Simples e Estáticos' }
+  ];
+
+  // ---------- Estado ----------
+  const state = {
+    categoriaAtiva: '',
+    ensaioSelecionado: '',
+    equipamentoSelecionado: '',
+    subtipoSelecionado: '',
+    horariosSelecionados: [],
+    horariosOcupados: new Set()
+  };
+
+  // ---------- Helpers ----------
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => document.querySelectorAll(sel);
+
+  const formatarData = (iso) => {
+    if (!iso) return '';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  };
+
+  const validarEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!re.test(email)) return { ok: false, msg: 'Formato de e-mail inválido.' };
+    const dominio = email.split('@')[1].toLowerCase();
+    const dominioOk = CONFIG.EMAIL_PERMITIDOS.some(d => dominio === d || dominio.endsWith('.' + d));
+    if (!dominioOk) {
+      return { ok: false, msg: 'Use um e-mail institucional (@ufc.br, @alu.ufc.br ou @det.ufc.br).' };
+    }
+    return { ok: true };
+  };
+
+  const validarData = (iso) => {
+    if (!iso) return { ok: false, msg: 'Selecione uma data.' };
+    const data = new Date(iso + 'T00:00:00');
+    const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+    if (data < hoje) return { ok: false, msg: 'Não é possível agendar em datas passadas.' };
+    const dia = data.getDay();
+    if (dia === 0 || dia === 6) return { ok: false, msg: 'Agendamentos só de segunda a sexta-feira.' };
+    return { ok: true };
+  };
+
+  const setErro = (campo, mensagem) => {
+    const input = $('#' + campo);
+    const erro = $('#erro-' + campo);
+    if (mensagem) {
+      input?.classList.add('invalid');
+      input?.setAttribute('aria-invalid', 'true');
+      if (erro) erro.textContent = mensagem;
+    } else {
+      input?.classList.remove('invalid');
+      input?.removeAttribute('aria-invalid');
+      if (erro) erro.textContent = '';
+    }
+  };
+
+  const mostrarFeedback = (msg, tipo = 'info') => {
+    const el = $('#mensagem-feedback');
+    el.textContent = msg;
+    el.className = 'mensagem-feedback ' + tipo;
+    el.hidden = false;
+    if (tipo !== 'sucesso') {
+      setTimeout(() => { el.hidden = true; }, 6000);
+    }
+  };
+
+  // ---------- Inicialização ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    configurarDataMinima();
+    bindEventos();
+  });
+
+  function configurarDataMinima() {
+    const input = $('#data');
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    input.min = `${ano}-${mes}-${dia}`;
+
+    const max = new Date(); max.setMonth(max.getMonth() + 3);
+    input.max = max.toISOString().split('T')[0];
+  }
+
+  function bindEventos() {
+    // Categorias
+    $$('.categoria-card').forEach(btn => {
+      btn.addEventListener('click', () => escolherCategoria(btn.dataset.categoria));
+    });
+
+    $('#btn-voltar').addEventListener('click', voltarInicio);
+
+    // Validação em tempo real
+    $('#nome').addEventListener('blur', () => {
+      const v = $('#nome').value.trim();
+      setErro('nome', v.length < 3 ? 'Informe seu nome completo.' : '');
+    });
+
+    $('#email').addEventListener('blur', () => {
+      const v = $('#email').value.trim();
+      const r = validarEmail(v);
+      setErro('email', r.ok ? '' : r.msg);
+    });
+
+    $('#data').addEventListener('change', () => {
+      const v = $('#data').value;
+      const r = validarData(v);
+      setErro('data', r.ok ? '' : r.msg);
+      if (r.ok) carregarHorarios(v);
+      else limparTabela('Selecione uma data válida.');
+    });
+
+    // Detalhes
+    $('#qtd-amostras').addEventListener('input', atualizarResumo);
+    $('#obs-ensaio').addEventListener('input', atualizarResumo);
+    $('#qtd-alunos').addEventListener('input', atualizarResumo);
+
+    // Subtipos
+    $$('.btn-opcao').forEach(btn => {
+      btn.addEventListener('click', () => definirSubtipo(btn.dataset.subtipo, btn));
+    });
+
+    // Submit
+    $('#form-agendamento').addEventListener('submit', (e) => {
+      e.preventDefault();
+      reservarSelecionados();
+    });
+  }
+
+  // ---------- Navegação ----------
+  function escolherCategoria(nome) {
+    state.categoriaAtiva = nome;
+    state.ensaioSelecionado = '';
+    state.equipamentoSelecionado = '';
+    state.subtipoSelecionado = '';
+
+    $('#categoria-display').value = nome;
+    $('#selecao-inicial').hidden = true;
+    $('#conteudo-principal').hidden = false;
+
+    const containerCards = $('#container-cards-padrao');
+    const containerLista = $('#container-lista-aulas');
+    const extras = $$('.campos-extras');
+    const tituloCards = $('#titulo-selecao-cards');
+    const listaInfo = $('#lista-info-geral');
+    const grupoAlunos = $('#grupo-qtd-alunos');
+    const instrucoes = $('#texto-instrucoes');
+
+    containerCards.innerHTML = '';
+    $('#caixa-equipamentos').hidden = true;
+    $('#container-detalhes').hidden = true;
+
+    if (nome === 'USO DO LABORATÓRIO PARA AULAS') {
+      tituloCards.innerHTML = '<span aria-hidden="true">➤</span> Selecione os ensaios que serão apresentados em aula';
+      listaInfo.innerHTML = `
+        <li><strong>1.</strong> É proibida a entrada usando chinelos, sandálias ou calçados abertos.</li>
+        <li><strong>2.</strong> Não é permitido comer ou beber no laboratório.</li>
+        <li><strong>3.</strong> Avise com pelo menos 48h de antecedência.</li>
+      `;
+      instrucoes.textContent = 'Marque todos os ensaios que serão demonstrados durante a aula. Informe a quantidade de alunos para preparar o espaço.';
+      grupoAlunos.hidden = false;
+      containerCards.hidden = true;
+      containerLista.hidden = false;
+      extras.forEach(el => el.hidden = true);
+      gerarListaAulas();
+    } else {
+      listaInfo.innerHTML = `
+        <li><strong>1.</strong> Utilizar EPIs obrigatórios (jaleco, óculos e calçado fechado).</li>
+        <li><strong>2.</strong> Manter o laboratório limpo e organizado após o uso.</li>
+        <li class="aviso"><strong>3.</strong> Reservas até sexta às 12:00 terão prioridade para a próxima semana.</li>
+      `;
+      instrucoes.textContent = 'Selecione o equipamento ou procedimento desejado, informe quantidade de amostras e horários.';
+      grupoAlunos.hidden = true;
+      containerCards.hidden = false;
+      containerLista.hidden = true;
+      extras.forEach(el => el.hidden = false);
+
+      tituloCards.innerHTML = (nome === 'ENSAIOS MECÂNICOS')
+        ? '<span aria-hidden="true">➤</span> Selecione o equipamento'
+        : '<span aria-hidden="true">➤</span> Selecione o equipamento ou procedimento';
+
+      const lista = (nome === 'ENSAIOS MECÂNICOS') ? cardsMecanicos : cardsCaracterizacao;
+      lista.forEach((item, i) => {
+        const card = document.createElement('button');
+        card.type = 'button';
+        card.className = 'ensaio-card';
+        card.setAttribute('role', 'listitem');
+        card.setAttribute('aria-label', `${item.n} - ${item.eq}`);
+        card.dataset.nome = item.n;
+        card.innerHTML = `
+          <img src="img/${item.img}" alt="" loading="lazy"
+               onerror="this.style.background='#e1e8ed';this.src='data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 60%22><rect fill=%22%23e1e8ed%22 width=%22100%22 height=%2260%22/><text x=%2250%22 y=%2235%22 font-size=%228%22 text-anchor=%22middle%22 fill=%22%231A4A5A%22>Sem imagem</text></svg>'">
+          <div class="info"><h5>${i + 1} - ${item.n}</h5></div>
+        `;
+        card.addEventListener('click', () => selecionarEnsaio(card, item.n, item.eq));
+        containerCards.appendChild(card);
+      });
+    }
+
+    // Carrega a tabela de horários já com a data de hoje (ou a próxima útil),
+    // assim o usuário já vê os checkboxes para marcar.
+    if (!$('#data').value) {
+      const proxima = proximoDiaUtil();
+      $('#data').value = proxima;
+    }
+    carregarHorarios($('#data').value);
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function proximoDiaUtil() {
+    const d = new Date();
+    while (d.getDay() === 0 || d.getDay() === 6) d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  }
+
+  function voltarInicio() {
+    if (state.ensaioSelecionado || state.horariosSelecionados.length) {
+      if (!confirm('Tem certeza? Os dados preenchidos serão perdidos.')) return;
+    }
+    $('#selecao-inicial').hidden = false;
+    $('#conteudo-principal').hidden = true;
+    $('#form-agendamento').reset();
+    state.categoriaAtiva = '';
+    state.ensaioSelecionado = '';
+    state.subtipoSelecionado = '';
+    state.horariosSelecionados = [];
+    $('#resumo-agendamento').hidden = true;
+    $('#mensagem-feedback').hidden = true;
+  }
+
+  // ---------- Seleções ----------
+  function selecionarEnsaio(elemento, nome, eq) {
+    $$('.ensaio-card').forEach(c => c.classList.remove('selected'));
+    elemento.classList.add('selected');
+    state.ensaioSelecionado = nome;
+    state.equipamentoSelecionado = eq;
+
+    const precisaOpcoes = /marshall|superpave/i.test(nome);
+    $('#container-detalhes').hidden = false;
+    $('#opcoes-estado-mistura').hidden = !precisaOpcoes;
+    $('#caixa-equipamentos').hidden = false;
+    $('#lista-equipamentos').textContent = eq;
+
+    if (!precisaOpcoes) state.subtipoSelecionado = '';
+    atualizarResumo();
+  }
+
+  function definirSubtipo(tipo, botao) {
+    $$('.btn-opcao').forEach(b => b.classList.remove('active'));
+    botao.classList.add('active');
+    state.subtipoSelecionado = ' (' + tipo + ')';
+    atualizarResumo();
+  }
+
+  function gerarListaAulas() {
+    const container = $('#container-lista-aulas');
+    let html = '<h4>Marque os ensaios da aula:</h4>';
+    cardsCaracterizacao.forEach(item => {
+      html += `
+        <label class="item-aula-checkbox">
+          <input type="checkbox" class="check-ensaio-aula" value="${item.n}">
+          <span>${item.n}</span>
+        </label>
+      `;
+    });
+    container.innerHTML = html;
+    container.querySelectorAll('.check-ensaio-aula').forEach(c => {
+      c.addEventListener('change', atualizarResumo);
+    });
+  }
+
+  // ---------- Horários ----------
+  function limparTabela(msg) {
+    $('#corpo-agenda').innerHTML = `<tr><td colspan="3" class="placeholder-horarios">${msg}</td></tr>`;
+    $('#status-horarios').textContent = '';
+  }
+
+  async function carregarHorarios(data) {
+    const corpo = $('#corpo-agenda');
+    const statusEl = $('#status-horarios');
+    corpo.innerHTML = `<tr><td colspan="3" class="placeholder-horarios"><span class="spinner"></span>Carregando horários...</td></tr>`;
+    statusEl.textContent = '';
+
+    // Em produção, aqui você consultaria o Apps Script para saber horários ocupados.
+    // Por enquanto deixamos um stub seguro: se você implementar o endpoint, descomente abaixo.
+    let ocupados = new Set();
+    try {
+      // const r = await fetch(`${CONFIG.APPS_SCRIPT_URL}?acao=listar&data=${encodeURIComponent(data)}`);
+      // const json = await r.json();
+      // if (Array.isArray(json.ocupados)) ocupados = new Set(json.ocupados);
+    } catch (e) {
+      console.warn('Não foi possível buscar horários ocupados:', e);
+    }
+    state.horariosOcupados = ocupados;
+
+    let html = '';
+    for (let h = CONFIG.HORA_INICIAL; h <= CONFIG.HORA_FINAL; h++) {
+      const hora = h.toString().padStart(2, '0') + ':00';
+      const ocupado = ocupados.has(hora);
+      html += `
+        <tr class="${ocupado ? 'indisponivel' : ''}">
+          <td>${hora}</td>
+          <td><span class="${ocupado ? 'status-indisponivel' : 'status-disponivel'}">
+            ${ocupado ? 'Reservado' : 'Disponível'}
+          </span></td>
+          <td>
+            <input type="checkbox" name="selecionar-hora" value="${hora}"
+                   ${ocupado ? 'disabled' : ''}
+                   aria-label="Selecionar horário ${hora}">
+          </td>
+        </tr>`;
+    }
+    corpo.innerHTML = html;
+
+    corpo.querySelectorAll('input[name="selecionar-hora"]').forEach(c => {
+      c.addEventListener('change', () => {
+        c.closest('tr')?.classList.toggle('has-checked', c.checked);
+        atualizarResumo();
+      });
+    });
+
+    const totalLivres = (CONFIG.HORA_FINAL - CONFIG.HORA_INICIAL + 1) - ocupados.size;
+    statusEl.textContent = `${totalLivres} horário(
