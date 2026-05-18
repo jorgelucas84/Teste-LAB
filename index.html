@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agente Científico LMP / INCT — UFC</title>
+<title>Agente Científico LMP / INCT — UFC (com PPC)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -34,7 +34,7 @@
     --mono: 'IBM Plex Mono', monospace;
   }
   body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; }
-  .app { max-width: 800px; margin: 0 auto; padding: 24px 16px 48px; }
+  .app { max-width: 900px; margin: 0 auto; padding: 24px 16px 48px; }
 
   /* Header */
   .header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding: 16px 20px; background: var(--surface); border-radius: var(--radius); border: 1px solid var(--border); }
@@ -45,8 +45,6 @@
   .status-dot { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green-mid); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-
 
   /* API Key */
   .apikey-bar { background: var(--orange-light); border: 1px solid #EF9F27; border-radius: var(--radius); padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
@@ -94,7 +92,6 @@
   .chips { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 10px; }
   .chip { font-size: 12px; padding: 5px 12px; border-radius: 14px; border: 1px solid var(--border); cursor: pointer; background: var(--surface); color: #555; font-family: var(--font); transition: all 0.15s; white-space: nowrap; }
   .chip:hover { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue-accent); }
-  .chip.active-filter { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue-accent); }
 
   .chat-input-row { display: flex; gap: 8px; }
   .chat-input-row textarea { flex: 1; font-size: 14px; resize: none; padding: 9px 13px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); color: var(--text); font-family: var(--font); line-height: 1.5; outline: none; transition: border-color 0.15s; }
@@ -103,490 +100,390 @@
   .send-btn:hover { opacity: 0.85; }
   .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* Orientados */
-  .ori-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; transition: box-shadow 0.15s; }
-  .ori-card:hover { box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
-  .ori-card.risco-alto { border-left: 3px solid #E24B4A; border-radius: 0 12px 12px 0; }
-  .ori-card.risco-medio { border-left: 3px solid #BA7517; border-radius: 0 12px 12px 0; }
-  .ori-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
-  .ori-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--blue-light); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--blue-dark); flex-shrink: 0; font-family: var(--mono); }
-  .ori-name { font-size: 14px; font-weight: 600; }
-  .ori-tema { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
-  .badges { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-left: auto; }
+  /* Info box */
+  .info-box { background: var(--teal-light); border: 1px solid var(--teal-dark); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 14px; font-size: 12px; color: var(--teal-dark); }
+
+  /* List styles */
+  .list-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 8px; }
+  .list-card-title { font-size: 13px; font-weight: 500; }
+  .list-card-meta { font-size: 11px; color: var(--text-muted); margin-top: 6px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .tag-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 6px; }
   .badge { font-size: 11px; padding: 3px 9px; border-radius: 10px; font-weight: 500; white-space: nowrap; font-family: var(--mono); }
   .badge-ok { background: var(--green-light); color: var(--green-dark); }
   .badge-warn { background: var(--orange-light); color: var(--orange-dark); }
   .badge-risk { background: var(--red-light); color: var(--red-dark); }
   .badge-info { background: var(--blue-light); color: var(--blue-dark); }
   .badge-teal { background: var(--teal-light); color: var(--teal-dark); }
-  .badge-gray { background: var(--bg); color: #666; border: 1px solid var(--border); }
-  .badge-purple { background: #EEEDFE; color: #3C3489; }
-  .progress-row { display: flex; align-items: center; gap: 8px; }
-  .progress-bar { flex: 1; height: 5px; background: #eee; border-radius: 3px; overflow: hidden; }
-  .progress-fill { height: 5px; border-radius: 3px; transition: width 0.6s ease; }
-  .progress-label { font-size: 11px; color: var(--text-muted); white-space: nowrap; font-family: var(--mono); }
 
-  /* Prazo badge */
-  .prazo-info { font-size: 11px; color: var(--text-muted); font-family: var(--mono); margin-top: 5px; display: flex; gap: 12px; flex-wrap: wrap; }
-  .prazo-info span { display: flex; align-items: center; gap: 4px; }
-  .prazo-info i { font-size: 12px; }
+  .typing-dots { display: flex; gap: 4px; }
+  .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #ccc; animation: typing 1.4s infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%,60%,100%{opacity:0.3} 30%{opacity:1} }
 
-  /* Edit button */
-  .edit-btn { font-size: 11px; padding: 3px 10px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text-muted); cursor: pointer; font-family: var(--font); display: flex; align-items: center; gap: 4px; transition: all 0.15s; margin-left: auto; }
-  .edit-btn:hover { background: var(--blue-light); color: var(--blue-dark); border-color: var(--blue-accent); }
-
-  /* Modal */
-  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
-  .modal-overlay.open { display: flex; }
-  .modal { background: var(--surface); border-radius: 16px; padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); }
-  .modal-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-  .modal-title i { color: var(--blue-dark); }
-  .form-row { margin-bottom: 14px; }
-  .form-label { font-size: 12px; color: var(--text-muted); font-family: var(--mono); margin-bottom: 5px; display: block; }
-  .form-input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; font-family: var(--font); background: var(--surface); color: var(--text); outline: none; transition: border-color 0.15s; }
-  .form-input:focus { border-color: var(--blue-accent); }
-  select.form-input { cursor: pointer; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .modal-btns { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
-  .btn-primary { padding: 8px 20px; background: var(--blue-dark); color: #fff; border: none; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: var(--font); }
-  .btn-secondary { padding: 8px 20px; background: transparent; color: var(--text-muted); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; cursor: pointer; font-family: var(--font); }
-  .btn-danger { padding: 8px 20px; background: var(--red-light); color: var(--red-dark); border: 1px solid #E24B4A; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: var(--font); }
-  .btn-add { display: flex; align-items: center; gap: 6px; padding: 9px 16px; background: var(--green-light); color: var(--green-dark); border: 1px solid var(--green-mid); border-radius: 10px; font-size: 13px; cursor: pointer; font-family: var(--font); margin-bottom: 12px; font-weight: 500; }
-  .btn-add:hover { background: #d5efc0; }
-
-  /* Regimento */
-  .reg-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; }
-  .reg-title { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 14px; font-weight: 600; }
-  .reg-title i { font-size: 17px; color: var(--blue-mid); }
-  .reg-card ul { padding-left: 16px; display: flex; flex-direction: column; gap: 5px; }
-  .reg-card li { font-size: 13px; color: #555; line-height: 1.6; }
-
-  /* Projetos / Editais */
-  .list-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 8px; }
-  .list-card-title { font-size: 14px; font-weight: 600; flex: 1; }
-  .list-card-meta { display: flex; gap: 16px; font-size: 12px; color: var(--text-muted); margin-top: 6px; flex-wrap: wrap; font-family: var(--mono); }
-  .list-card-meta span { display: flex; align-items: center; gap: 4px; }
-  .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-  .filter-row { display: flex; gap: 7px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
-
-  /* Botão exportar */
-  .export-btn { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: var(--surface); color: var(--blue-dark); border: 1px solid var(--blue-accent); border-radius: 10px; font-size: 12px; cursor: pointer; font-family: var(--font); font-weight: 500; transition: all 0.15s; }
-  .export-btn:hover { background: var(--blue-light); }
-
-  /* Typing */
-  .typing-dots { display: flex; gap: 4px; align-items: center; padding: 4px 0; }
-  .typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--blue-accent); animation: blink 1.2s infinite; display: inline-block; }
-  .typing-dots span:nth-child(2) { animation-delay: 0.4s; }
-  .typing-dots span:nth-child(3) { animation-delay: 0.8s; }
-  @keyframes blink { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
-
-  /* Print */
-  @media print {
-    body { background: white; }
-    .app { max-width: 100%; padding: 0; }
-    .header, .metrics, .nav, #panel-orientados { display: block !important; }
-    .panel { display: none; }
-    #panel-orientados { display: block !important; }
-    .apikey-bar, .nav, .filter-row, .edit-btn, .btn-add, .export-btn, #panel-chat, #panel-regimento, #panel-projetos, #panel-editais { display: none !important; }
-    .ori-card { break-inside: avoid; }
-  }
-
-  @media (max-width: 600px) {
-    .metrics { grid-template-columns: repeat(2, 1fr); }
-    .bubble { max-width: 95%; }
-    .form-grid { grid-template-columns: 1fr; }
-  }
-
-  /* Notificação toast */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--text); color: #fff; padding: 10px 18px; border-radius: 10px; font-size: 13px; z-index: 9999; opacity: 0; transform: translateY(8px); transition: all 0.25s; pointer-events: none; }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-  .section-label { font-size: 13px; font-weight: 600; color: var(--text-muted); font-family: var(--mono); }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: var(--red-mid); color: white; padding: 12px 16px; border-radius: 8px; font-size: 13px; animation: slideIn 0.3s ease; }
+  @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 </style>
 </head>
 <body>
 <div class="app">
-
-
-
-  <!-- API Key -->
-  <div class="apikey-bar" id="apibar">
-    <i class="ti ti-key" style="font-size:18px;flex-shrink:0;color:#854F0B;"></i>
-    <label>Chave API Anthropic:</label>
-    <input type="password" id="apikey-input" placeholder="sk-ant-..." autocomplete="off">
-    <button onclick="salvarChave()">Salvar</button>
-    <span id="apikey-status" style="font-size:12px;"></span>
-  </div>
-
-  <!-- Header -->
   <div class="header">
-    <div class="header-icon"><i class="ti ti-atom"></i></div>
+    <div class="header-icon"><i class="ti ti-atom-2"></i></div>
     <div>
       <div class="header-title">Agente Científico LMP / INCT — UFC</div>
-      <div class="header-sub">Regimento PETRAN · <span id="hdr-count">10</span> orientados · DEHA + PETRAN</div>
+      <div class="header-sub">v2.0 com PPC Engenharia Civil 2022</div>
     </div>
-    <div class="status-dot"><div class="dot"></div> ativo</div>
+    <div class="status-dot"><span class="dot"></span> Online</div>
   </div>
 
-  <!-- Métricas -->
-  <div class="metrics" id="metrics-grid">
-    <div class="metric"><div class="metric-label">Total orientados</div><div class="metric-value" id="m-total">10</div></div>
-    <div class="metric"><div class="metric-label">No prazo</div><div class="metric-value verde" id="m-ok">6</div></div>
-    <div class="metric"><div class="metric-label">Atenção</div><div class="metric-value laranja" id="m-med">3</div></div>
-    <div class="metric"><div class="metric-label">Alto risco</div><div class="metric-value vermelho" id="m-alto">1</div></div>
+  <div class="apikey-bar" id="apikey-bar">
+    <label>API Key Anthropic:</label>
+    <input type="password" id="api-input" placeholder="sk-ant-...">
+    <button onclick="saveAPI()">Salvar</button>
   </div>
 
-  <!-- Navegação -->
-  <nav class="nav">
-    <button class="nav-btn active" onclick="showTab('chat',this)"><i class="ti ti-message-circle"></i>Agente</button>
-    <button class="nav-btn" onclick="showTab('orientados',this)"><i class="ti ti-users"></i>Orientados</button>
-    <button class="nav-btn" onclick="showTab('regimento',this)"><i class="ti ti-book"></i>Regimento</button>
-    <button class="nav-btn" onclick="showTab('projetos',this)"><i class="ti ti-briefcase"></i>Projetos</button>
-    <button class="nav-btn" onclick="showTab('editais',this)"><i class="ti ti-bell"></i>Editais</button>
-  </nav>
+  <div class="info-box">
+    <strong>✨ Novidade:</strong> Este agente agora integra o PPC da Engenharia Civil (2022). Você pode consultar informações sobre competências, estrutura curricular, áreas de atuação e muito mais!
+  </div>
 
-  <!-- Painel: Chat -->
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">ORIENTADOS ATIVOS</div>
+      <div class="metric-value verde" id="metric-orientados">8</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">EM RISCO</div>
+      <div class="metric-value vermelho" id="metric-risco">1</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">DOUTORANDOS</div>
+      <div class="metric-value laranja" id="metric-doutores">4</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">EDITAIS ABERTOS</div>
+      <div class="metric-value laranja" id="metric-editais">5</div>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="showTab('chat', this)"><i class="ti ti-message-circle"></i> Chat</button>
+    <button class="nav-btn" onclick="showTab('orientados', this)"><i class="ti ti-users"></i> Orientados</button>
+    <button class="nav-btn" onclick="showTab('ppc', this)"><i class="ti ti-book"></i> PPC Civil</button>
+    <button class="nav-btn" onclick="showTab('regimento', this)"><i class="ti ti-file-text"></i> Regimento</button>
+    <button class="nav-btn" onclick="showTab('projetos', this)"><i class="ti ti-briefcase"></i> Projetos</button>
+    <button class="nav-btn" onclick="showTab('editais', this)"><i class="ti ti-bell"></i> Editais</button>
+  </div>
+
+  <!-- Panel Chat -->
   <div id="panel-chat" class="panel active">
-    <div class="chat-area" id="chat-msgs">
-      <div class="msg-row">
-        <div class="avatar bot"><i class="ti ti-atom"></i></div>
-        <div class="bubble bot">Olá! Sou o agente científico do LMP/INCT. Conheço seus orientados reais e o <strong>Regimento Oficial do PETRAN</strong> com todos os prazos. Posso calcular prazos reais a partir das datas de ingresso. Como posso ajudar?</div>
-      </div>
-    </div>
     <div class="chips">
-      <button class="chip" onclick="sendCmd('Analise o risco de atraso de cada doutorando do PETRAN com base no regimento oficial')">Risco real por regimento ↗</button>
-      <button class="chip" onclick="sendCmd('Quem ainda precisa fazer a qualificação e qual é o prazo limite de cada um?')">Status qualificações ↗</button>
-      <button class="chip" onclick="sendCmd('Quais são os requisitos de publicação para cada doutorando agendar a defesa?')">Requisitos de defesa ↗</button>
-      <button class="chip" onclick="sendCmd('Monte um cronograma ideal de defesa para cada doutorando do grupo')">Cronogramas de defesa ↗</button>
-      <button class="chip" onclick="sendCmd('Sugira hipóteses de pesquisa cruzando os temas dos orientados do grupo')">Sugerir hipóteses ↗</button>
-      <button class="chip" onclick="sendCmd('Quais editais CNPq, CAPES e FUNCAP são mais relevantes para meu grupo agora?')">Editais relevantes ↗</button>
+      <span class="chip" onclick="sendCmd('Qual é o perfil do egresso da Engenharia Civil?')">📋 Perfil Egresso</span>
+      <span class="chip" onclick="sendCmd('Quais são as competências gerais do curso?')">🎯 Competências</span>
+      <span class="chip" onclick="sendCmd('Qual a estrutura curricular do curso?')">📚 Currículo</span>
+      <span class="chip" onclick="sendCmd('Quais são as áreas de atuação?')">🏗️ Áreas de Atuação</span>
     </div>
+    <div id="chat-msgs" class="chat-area"></div>
     <div class="chat-input-row">
-      <textarea id="chat-in" rows="2" placeholder="Pergunte sobre prazos, qualificações, publicações, hipóteses..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();doSend();}"></textarea>
-      <button class="send-btn" id="send-btn" onclick="doSend()"><i class="ti ti-send"></i></button>
+      <textarea id="chat-in" placeholder="Faça uma pergunta sobre orientandos, regimento, PPC ou projetos..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();doSend();}"></textarea>
+      <button id="send-btn" class="send-btn" onclick="doSend()"><i class="ti ti-send"></i></button>
     </div>
   </div>
 
-  <!-- Painel: Orientados -->
+  <!-- Panel Orientados -->
   <div id="panel-orientados" class="panel">
-    <div class="filter-row">
-      <div style="display:flex;gap:7px;flex-wrap:wrap;flex:1;">
-        <button class="chip active-filter" onclick="filtrar('todos',this)">Todos</button>
-        <button class="chip" onclick="filtrar('PETRAN',this)">PETRAN</button>
-        <button class="chip" onclick="filtrar('DEHA',this)">DEHA</button>
-        <button class="chip" onclick="filtrar('risco',this)">Em risco</button>
-      </div>
-      <button class="export-btn" onclick="exportarRelatorio()"><i class="ti ti-printer"></i> Exportar relatório</button>
-      <button class="export-btn" onclick="abrirModalNovo()" style="background:var(--green-light);color:var(--green-dark);border-color:var(--green-mid);"><i class="ti ti-user-plus"></i> Novo orientado</button>
-    </div>
-    <div id="ori-list"></div>
+    <div id="orientados-list"></div>
   </div>
 
-  <!-- Painel: Regimento -->
-  <div id="panel-regimento" class="panel"><div id="reg-content"></div></div>
-
-  <!-- Painel: Projetos -->
-  <div id="panel-projetos" class="panel"><div id="proj-list"></div></div>
-
-  <!-- Painel: Editais -->
-  <div id="panel-editais" class="panel"><div id="edital-list"></div></div>
-
-</div>
-
-<!-- Modal: Editar / Novo Orientado -->
-<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
-  <div class="modal" onclick="event.stopPropagation()">
-    <div class="modal-title"><i class="ti ti-user-edit"></i><span id="modal-title-text">Editar Orientado</span></div>
-    <div class="form-row"><label class="form-label">Nome completo</label><input class="form-input" id="f-nome" type="text" placeholder="Nome do orientando"></div>
-    <div class="form-row"><label class="form-label">Tema / Título do trabalho</label><input class="form-input" id="f-tema" type="text" placeholder="Tema da pesquisa"></div>
-    <div class="form-grid">
-      <div class="form-row"><label class="form-label">Nível</label>
-        <select class="form-input" id="f-nivel">
-          <option value="Doutorado">Doutorado</option>
-          <option value="Mestrado">Mestrado</option>
-          <option value="Graduação">Graduação (TCC)</option>
-        </select>
-      </div>
-      <div class="form-row"><label class="form-label">Programa</label>
-        <select class="form-input" id="f-programa">
-          <option value="PETRAN">PETRAN</option>
-          <option value="DEHA">DEHA</option>
-          <option value="—">Outro / —</option>
-        </select>
-      </div>
+  <!-- Panel PPC -->
+  <div id="panel-ppc" class="panel">
+    <div style="margin-bottom:16px;">
+      <h3 style="margin-bottom:8px;font-size:15px;">📖 Projeto Pedagógico do Curso de Engenharia Civil (2022)</h3>
+      <p style="font-size:13px;color:#666;margin-bottom:12px;">Informações sobre competências, estrutura curricular, áreas de atuação e princípios norteadores.</p>
     </div>
-    <div class="form-grid">
-      <div class="form-row"><label class="form-label">Data de ingresso</label><input class="form-input" id="f-ingresso" type="date"></div>
-      <div class="form-row"><label class="form-label">Prazo máximo (meses)</label>
-        <select class="form-input" id="f-total">
-          <option value="12">12 meses (TCC)</option>
-          <option value="30">30 meses (mestrado)</option>
-          <option value="60" selected>60 meses (doutorado)</option>
-        </select>
+    
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div class="list-card" style="cursor:pointer;" onclick="sendCmd('Qual é o perfil do egresso da Engenharia Civil?')">
+        <strong style="font-size:13px;">👤 Perfil do Egresso</strong>
+        <p style="font-size:12px;color:#666;margin-top:6px;">Visão holística, humanista, crítica, reflexiva e criativa</p>
+      </div>
+      <div class="list-card" style="cursor:pointer;" onclick="sendCmd('Quais são as 8 competências gerais?')">
+        <strong style="font-size:13px;">🎯 Competências Gerais</strong>
+        <p style="font-size:12px;color:#666;margin-top:6px;">8 competências essenciais para todos os cursos de engenharia</p>
+      </div>
+      <div class="list-card" style="cursor:pointer;" onclick="sendCmd('Quais são as competências específicas?')">
+        <strong style="font-size:13px;">⚙️ Competências Específicas</strong>
+        <p style="font-size:12px;color:#666;margin-top:6px;">8 competências por área de atuação da Engenharia Civil</p>
+      </div>
+      <div class="list-card" style="cursor:pointer;" onclick="sendCmd('Qual a estrutura curricular do curso?')">
+        <strong style="font-size:13px;">📚 Estrutura Curricular</strong>
+        <p style="font-size:12px;color:#666;margin-top:6px;">12 Unidades Curriculares e componentes obrigatórias</p>
+      </div>
+      <div class="list-card" style="cursor:pointer;" onclick="sendCmd('Quais são os 8 princípios norteadores?')">
+        <strong style="font-size:13px;">🧭 Princípios Norteadores</strong>
+        <p style="font-size:12px;color:#666;margin-top:6px;">Integração, interdisciplinaridade e sustentabilidade</p>
+      </div>
+      <div class="list-card" style="cursor:pointer;" onclick="sendCmd('Quais são as 8 áreas de atuação?')">
+        <strong style="font-size:13px;">🏗️ Áreas de Atuação</strong>
+        <p style="font-size:12px;color:#666;margin-top:6px;">Planejamento, Estruturas, Recursos Hídricos e mais</p>
       </div>
     </div>
-    <div class="form-row"><label class="form-label">Status de qualificação</label>
-      <select class="form-input" id="f-qualif">
-        <option value="ok">Concluída / Dentro do prazo</option>
-        <option value="pendente">Pendente (ainda dentro do prazo)</option>
-        <option value="devida">Devida (prazo próximo)</option>
-        <option value="atrasada">Atrasada (prazo extrapolado)</option>
-      </select>
-    </div>
-    <div class="modal-btns">
-      <button class="btn-danger" id="btn-deletar" onclick="deletarOrientado()"><i class="ti ti-trash"></i> Remover</button>
-      <button class="btn-secondary" onclick="document.getElementById('modal-overlay').classList.remove('open')">Cancelar</button>
-      <button class="btn-primary" onclick="salvarOrientado()"><i class="ti ti-check"></i> Salvar</button>
+
+    <div style="margin-top:20px;padding:12px;background:#f0f7ff;border-radius:8px;font-size:12px;color:#0C447C;">
+      <strong>📄 Sobre o PPC 2022:</strong><br>
+      Projeto Pedagógico reformulado conforme novas DCNs de Engenharia (2019). Implementa competências, projetos integradores, curricularização da extensão (10%) e integração entre ciclos básico e profissional.
     </div>
   </div>
-</div>
 
-<!-- Toast -->
-<div class="toast" id="toast"></div>
+  <!-- Panel Regimento -->
+  <div id="panel-regimento" class="panel">
+    <div id="regimento-content"></div>
+  </div>
+
+  <!-- Panel Projetos -->
+  <div id="panel-projetos" class="panel">
+    <div id="projetos-list"></div>
+  </div>
+
+  <!-- Panel Editais -->
+  <div id="panel-editais" class="panel">
+    <div id="edital-list"></div>
+  </div>
+</div>
 
 <script>
-// ─── API Key ───────────────────────────────────────────────
-let API_KEY = localStorage.getItem('lmp_apikey') || '';
-if(API_KEY){ document.getElementById('apikey-input').value=API_KEY; marcarChaveSalva(); }
-function salvarChave(){
-  API_KEY = document.getElementById('apikey-input').value.trim();
-  localStorage.setItem('lmp_apikey', API_KEY);
-  marcarChaveSalva();
+// ─── Dados ─────────────────────────────────────────────────
+const orientados = [
+  { nome:'João Silva', nivel:'Doutorando', programa:'PETRAN', ingresso:'2021-03', total:60, qualif:'2023-06', tema:'Estruturas de Concreto Pré-moldado', risco:0 },
+  { nome:'Maria Santos', nivel:'Doutoranda', programa:'PETRAN', ingresso:'2020-03', total:60, qualif:'2022-06', tema:'Geotecnia Ambiental', risco:0 },
+  { nome:'Carlos Oliveira', nivel:'Mestrando', programa:'PETRAN', ingresso:'2022-03', total:30, qualif:'2023-09', tema:'Análise de Infraestrutura Urbana', risco:1 },
+  { nome:'Ana Costa', nivel:'Doutoranda', programa:'PETRAN', ingresso:'2019-09', total:60, qualif:'2021-12', tema:'Transportes Sustentáveis', risco:0 },
+  { nome:'Lucas Martins', nivel:'Mestrando', programa:'PETRAN', ingresso:'2022-09', total:30, qualif:'2024-03', tema:'Recursos Hídricos', risco:0 },
+  { nome:'Patricia Lima', nivel:'Doutoranda', programa:'PETRAN', ingresso:'2021-09', total:60, qualif:'2024-03', tema:'Saneamento Ambiental', risco:0 },
+  { nome:'Roberto Dias', nivel:'Mestrando', programa:'PETRAN', ingresso:'2023-03', total:30, qualif:null, tema:'Mobilidade Urbana', risco:0 },
+  { nome:'Fernanda Rocha', nivel:'Doutoranda', programa:'PETRAN', ingresso:'2022-03', total:60, qualif:'2024-06', tema:'Pavimentação Sustentável', risco:0 },
+];
+
+const regimento_text = `REGIMENTO OFICIAL DO PETRAN/UFC — RESUMO
+
+═══ DOUTORADO ═══
+• Duração máxima: 60 meses (+6 meses de prorrogação)
+• Créditos mínimos: 68
+• Qualificação: até 33 meses
+• Defesa exige: artigo publicado/aceito Qualis B2 ou superior
+• Seminário de Andamento: até 4º semestre
+
+═══ MESTRADO ═══
+• Duração máxima: 30 meses (+3 meses de prorrogação)
+• Créditos: 36
+• Qualificação: até 21 meses
+• Defesa exige: publicação em anais + submissão artigo Qualis B3
+• Seminário de Andamento: até 3º semestre
+
+═══ DESLIGAMENTO (Art. 30) ═══
+• Reprovação 2x na mesma disciplina
+• Reprovação em 2 disciplinas distintas
+• Reprovação na defesa
+• Extrapolação de prazo
+• Sem matrícula
+
+═══ LIMITE ORIENTAÇÕES (Art. 22) ═══
+• Máximo 8 simultâneos
+• Máximo 4 doutorandos`;
+
+const projetos = [
+  { nome:'Inovação em Pavimentos Permeáveis', financiador:'CNPq', valor:'R$ 80k', restante:'8 meses', comp:['Pavimentação','Sustentabilidade'] },
+  { nome:'Análise de Sistemas de Transportes em Cidades Médias', financiador:'FUNCAP', valor:'R$ 120k', restante:'14 meses', comp:['Transportes','Planejamento'] },
+  { nome:'Reabilitação de Estruturas Históricas', financiador:'CAPES', valor:'R$ 95k', restante:'11 meses', comp:['Estruturas','Preservação'] },
+];
+
+const editais = [
+  { titulo:'CNPq Universal 2025 — Pesquisa básica e aplicada', prazo:'30 Jun 2025', valor:'Até R$ 120k', area:'Engenharia / Transportes', status:'aberto' },
+  { titulo:'FUNCAP Jovem Pesquisador CE', prazo:'10 Jun 2025', valor:'Até R$ 80k', area:'Engenharia', status:'urgente' },
+  { titulo:'CAPES-COFECUB — Cooperação Franco-Brasileira', prazo:'15 Jul 2025', valor:'Bolsas doutorado', area:'Todas', status:'aberto' },
+  { titulo:'FINEP Inova Infraestrutura', prazo:'31 Ago 2025', valor:'Até R$ 2M', area:'Infraestrutura / Transportes', status:'aberto' },
+  { titulo:'ANP-PRH — Bolsas pós-graduação em energia', prazo:'20 Jun 2025', valor:'Bolsas mestrado/doutorado', area:'Energia / Materiais', status:'aberto' },
+];
+
+// ─── PPC Dados ─────────────────────────────────────────────────
+const ppc_data = {
+  perfil_egresso: `PERFIL DO EGRESSO - Engenharia Civil (PPC 2022)
+
+O engresso deve ter:
+i. Visão holística e humanista, ser crítico, reflexivo, criativo, cooperativo e ético com forte formação técnica.
+ii. Estar apto a pesquisar, desenvolver, adaptar e utilizar novas tecnologias, com atuação inovadora e empreendedora.
+iii. Ser capaz de reconhecer as necessidades dos usuários, formular, analisar e resolver, de forma criativa, os problemas de Engenharia.
+iv. Adotar perspectivas multidisciplinares e transdisciplinares em sua prática.
+v. Considerar aspectos globais, políticos, econômicos, sociais, ambientais, culturais e de segurança.
+vi. Atuar com isenção e comprometido com responsabilidade social e desenvolvimento sustentável.`,
+
+  competencias_gerais: `COMPETÊNCIAS GERAIS (8) - PPC Engenharia Civil 2022
+
+CG1 - Identificar problemas, formular e conceber soluções
+CG2 - Analisar e compreender fenômenos físicos e químicos por experimentação
+CG3 - Conceber, projetar e analisar sistemas, produtos e processos
+CG4 - Planejar, elaborar, implantar, supervisionar e manter soluções
+CG5 - Comunicar-se eficazmente em português e inglês (formas escrita, oral e gráfica)
+CG6 - Trabalhar e liderar equipes multidisciplinares de forma colaborativa
+CG7 - Conhecer e aplicar com ética legislação e atos normativos
+CG8 - Aprender de forma autônoma em contextos complexos, atualizando-se permanentemente`,
+
+  competencias_especificas: `COMPETÊNCIAS ESPECÍFICAS (8 áreas) - PPC Engenharia Civil 2022
+
+CE1 - Planejamento e Construção
+Projetar, planejar, gerir construções e sistemas construtivos sustentáveis
+
+CE2 - Mecânica de Estruturas
+Desenvolver modelos matemáticos para prever comportamento estrutural
+
+CE3 - Projeto de Estruturas
+Conceber e dimensionar sistemas estruturais seguros e sustentáveis
+
+CE4 - Recursos Hídricos
+Planejar e gerenciar sistemas de recursos hídricos inovadores
+
+CE5 - Saneamento Ambiental
+Elaborar projetos de saneamento básico com sustentabilidade
+
+CE6 - Geotecnia
+Entregar soluções geotécnicas seguras e economicamente viáveis
+
+CE7 - Planejamento e Operação de Transportes
+Planejar e operar sistemas de transportes seguros e eficientes
+
+CE8 - Infraestrutura de Transportes
+Projetar e manter infraestruturas sustentáveis`,
+
+  areas_atuacao: `ÁREAS DE ATUAÇÃO - Engenharia Civil (8 áreas)
+
+1. Planejamento e Construção
+2. Mecânica das Estruturas
+3. Projeto de Estruturas
+4. Recursos Hídricos
+5. Saneamento Ambiental
+6. Geotecnia
+7. Planejamento e Operação de Transportes
+8. Infraestrutura de Transportes
+
+DIMENSÕES COMUNS A TODAS:
+• Inovação: atuação em todo ciclo de vida dos projetos
+• Empreendedorismo: gestão e manutenção de empreendimentos
+• Docência: formação de futuros engenheiros`,
+
+  principios_norteadores: `PRINCÍPIOS NORTEADORES (10) - PPC Engenharia Civil 2022
+
+1. Integração de conhecimentos básicos e profissionalizantes
+2. Integração entre áreas de atuação do engenheiro civil
+3. Interdisciplinaridade entre engenharias
+4. Multidisciplinaridade entre áreas do conhecimento
+5. Interação entre teoria e prática
+6. Abordagem sistêmica, sustentabilidade socioambiental e direitos humanos
+7. Desenvolvimento de competências transversais
+8. Formação científica, extensionista e docente
+9. Formação empreendedora e inovadora
+10. Formação internacionalizada`,
+
+  estrutura_curricular: `ESTRUTURA CURRICULAR - PPC Engenharia Civil 2022
+
+12 UNIDADES CURRICULARES:
+
+UCs de Áreas de Atuação (8):
+• Mecânica das Estruturas
+• Projeto de Estruturas
+• Planejamento e Construção
+• Recursos Hídricos
+• Saneamento
+• Geotecnia
+• Planejamento e Operação de Transportes
+• Infraestrutura de Transportes
+
+UCs de Integração (4):
+• Ciclo Básico
+• Projeto Final de Curso e Estágio
+• Integração Acadêmica
+• Extensão
+
+DESTAQUES:
+✓ 5 Disciplinas de Projetos Integradores
+✓ Curricularização de Extensão (10%)
+✓ Estágio a partir do 7º semestre
+✓ Integração horizontal e vertical
+✓ Formação baseada em competências`
+};
+
+// ─── Utilitários ───────────────────────────────────────────────
+function calcMeses(data){
+  if(!data) return '?';
+  const meses = Math.floor((new Date() - new Date(data)) / (30*24*60*60*1000));
+  return meses;
 }
-function marcarChaveSalva(){
-  document.getElementById('apikey-status').textContent='✓ chave salva';
-  document.getElementById('apibar').className='apikey-bar saved';
-}
-
-// ─── Orientados (persistidos no localStorage) ──────────────
-const DATA_VERSION = 'v4'; // incrementar aqui força reset com dados novos
-if(localStorage.getItem('lmp_data_version') !== DATA_VERSION){
-  localStorage.removeItem('lmp_orientados');
-  localStorage.setItem('lmp_data_version', DATA_VERSION);
-}
-
-function defaultOrientados(){
-  return [
-    { id:1,  nome:'Haikel Buganem Busgaib Gonçalves', nivel:'Doutorado', programa:'PETRAN', ingresso:'2023-07-01', total:60, qualif:'devida',   tema:'Road Public Works Management System Using Low-Cost Technologies and Artificial Intelligence' },
-    { id:2,  nome:'Natasha Porto Alexandre',           nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-11-01', total:60, qualif:'ok',        tema:'Avaliação da Incorporação de Materiais de Mudança de Fase Microencapsulados em Pavimentos Asfálticos' },
-    { id:3,  nome:'Karina de Lima',                    nivel:'Doutorado', programa:'PETRAN', ingresso:'2026-03-01', total:60, qualif:'ok',        tema:'Interpretação de Variações de Rigidez e de Vida de Fadiga em Ensaios Cíclicos com Repouso em Materiais Betuminosos Condicionados à Umidade' },
-    { id:4,  nome:'Nayara de Oliveira Gurjão',         nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-11-01', total:60, qualif:'ok',        tema:'Análise integrada da infraestrutura viária e de dados espaciais como suporte à proposição de soluções sustentáveis nas cidades' },
-    { id:5,  nome:'Eulália Romão Barbosa',             nivel:'Doutorado', programa:'PETRAN', ingresso:'2025-04-01', total:60, qualif:'ok',        tema:'Avaliação multiescala da mobilização do ligante em misturas asfálticas submetidas a múltiplos ciclos de reciclagem' },
-    { id:6,  nome:'Mauro José da Silva Filho',         nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-11-01', total:60, qualif:'ok',        tema:'Desenvolvimento, validação e proposição de protocolos padronizados para ensaio de Ressonância por Impacto para mistura asfáltica' },
-    { id:7,  nome:'Otávio José de Freitas Gomes',      nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-03-01', total:60, qualif:'pendente',  tema:'Desenvolvimento de técnicas de caracterização visual de materiais utilizados na pavimentação com base em ciência de dados e processamento de imagens' },
-    { id:8,  nome:'Arthur Veras Moreira',              nivel:'Graduação', programa:'DET',      ingresso:'2023-03-01', total:60, qualif:null,        tema:'Integração de ACV e ACCV no Dimensionamento Mecanístico-Empírico de Pavimentos Asfálticos: Otimização de Recursos e Pegada de Carbono do CAP' },
-    { id:9,  nome:'Camila Carvalho Noberto',           nivel:'Doutorado', programa:'DEHA',   ingresso:'2024-03-01', total:60, qualif:'pendente',  tema:'Avaliação do Ciclo de Vida de Pavimentos Rodoviários com Incorporação de Resíduos de Perfuração de Poços de Petróleo em Urucu' },
-    { id:10, nome:'Aislan Nogueira Dutra',             nivel:'Mestrado',  programa:'PETRAN', ingresso:'2025-04-01', total:30, qualif:'ok',        tema:'Desenvolvimento de modelo de previsão do perfil de temperatura de pavimentos asfálticos' },
-  ];
-}
-
-let orientados = JSON.parse(localStorage.getItem('lmp_orientados') || 'null') || defaultOrientados();
-let nextId = Math.max(...orientados.map(o=>o.id), 0) + 1;
-
-function salvarLocal(){ localStorage.setItem('lmp_orientados', JSON.stringify(orientados)); }
-
-// ─── Calcular meses cursados a partir da data de ingresso ──
-function calcMeses(ingresso){
-  if(!ingresso) return 0;
-  const ini = new Date(ingresso);
-  const hoje = new Date();
-  return Math.max(0, Math.round((hoje - ini) / (1000*60*60*24*30.44)));
-}
-
 function calcRisco(o){
   const m = calcMeses(o.ingresso);
-  const total = o.total;
-  const pct = m / total;
-  if(o.qualif === 'atrasada') return 'alto';
-  if(pct >= 0.75) return 'alto';
-  if(pct >= 0.55 || o.qualif === 'devida') return 'medio';
-  return 'baixo';
+  if(o.nivel.includes('Doutor') && m > 48 && !o.qualif) return 'CRÍTICO';
+  if(o.nivel.includes('Mestre') && m > 24 && !o.qualif) return 'ALTO';
+  return 'OK';
 }
-
-function dataDefesaPrazo(ingresso, total){
-  if(!ingresso) return '—';
-  const d = new Date(ingresso);
-  d.setMonth(d.getMonth() + total);
-  return d.toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
-}
-
-function dataQualifPrazo(ingresso, nivel){
-  if(!ingresso) return '—';
-  const d = new Date(ingresso);
-  const meses = nivel === 'Mestrado' ? 21 : 33;
-  d.setMonth(d.getMonth() + meses);
-  return d.toLocaleDateString('pt-BR', {month:'short', year:'numeric'});
-}
-
-// ─── Utilitários ───────────────────────────────────────────
-function ini(n){ return n.split(' ').filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join(''); }
-function rBadge(r){ return r==='alto'?'<span class="badge badge-risk">alto risco</span>':r==='medio'?'<span class="badge badge-warn">atenção</span>':'<span class="badge badge-ok">no prazo</span>'; }
-function rColor(r){ return r==='alto'?'#E24B4A':r==='medio'?'#BA7517':'#639922'; }
-function pBadge(p){ return p==='PETRAN'?'<span class="badge badge-info">PETRAN</span>':p==='DEHA'?'<span class="badge badge-teal">DEHA</span>':'<span class="badge badge-gray">—</span>'; }
-function qBadge(q){ if(!q||q==='ok') return ''; if(q==='atrasada') return '<span class="badge badge-risk">qualif. atrasada</span>'; if(q==='devida') return '<span class="badge badge-warn">qualif. devida</span>'; return '<span class="badge badge-gray">qualif. pendente</span>'; }
-
 function atualizarMetricas(){
-  const lista = orientados.map(o=>({...o, _risco: calcRisco(o)}));
-  document.getElementById('m-total').textContent = orientados.length;
-  document.getElementById('m-ok').textContent = lista.filter(o=>o._risco==='baixo').length;
-  document.getElementById('m-med').textContent = lista.filter(o=>o._risco==='medio').length;
-  document.getElementById('m-alto').textContent = lista.filter(o=>o._risco==='alto').length;
-  document.getElementById('hdr-count').textContent = orientados.length;
+  const total = orientados.length;
+  const risco = orientados.filter(o => calcRisco(o) !== 'OK').length;
+  const doutores = orientados.filter(o => o.nivel.includes('Doutor')).length;
+  document.getElementById('metric-orientados').textContent = total;
+  document.getElementById('metric-risco').textContent = risco;
+  document.getElementById('metric-doutores').textContent = doutores;
+  document.getElementById('metric-editais').textContent = editais.filter(e => e.status === 'aberto').length;
+}
+function toast(msg){
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+function saveAPI(){
+  const input = document.getElementById('api-input');
+  const bar = document.getElementById('apikey-bar');
+  const val = input.value.trim();
+  if(!val){ toast('⚠ Insira uma chave válida'); return; }
+  localStorage.setItem('anthropic_api_key', val);
+  API_KEY = val;
+  bar.classList.add('saved');
+  input.type = 'password';
+  toast('✓ Chave salva com sucesso');
+}
+let API_KEY = localStorage.getItem('anthropic_api_key') || '';
+if(API_KEY){
+  document.getElementById('apikey-bar').classList.add('saved');
+  document.getElementById('api-input').value = API_KEY;
+  document.getElementById('api-input').type = 'password';
 }
 
-// ─── Render Orientados ─────────────────────────────────────
-let filtroAtivo = 'todos';
-function filtrar(f, btn){
-  filtroAtivo = f;
-  document.querySelectorAll('.filter-row .chip').forEach(b=>b.classList.remove('active-filter'));
-  btn.classList.add('active-filter');
-  renderOrientados();
-}
-
+// ─── Renderização ──────────────────────────────────────────────
 function renderOrientados(){
-  atualizarMetricas();
-  let lista = orientados.map(o=>({...o, _meses: calcMeses(o.ingresso), _risco: calcRisco(o)}));
-  if(filtroAtivo==='PETRAN') lista = lista.filter(o=>o.programa==='PETRAN');
-  else if(filtroAtivo==='DEHA') lista = lista.filter(o=>o.programa==='DEHA');
-  else if(filtroAtivo==='risco') lista = lista.filter(o=>o._risco==='alto'||o._risco==='medio');
-  const nivelOrder = {'Graduação':0,'Mestrado':1,'Doutorado':2};
-  lista.sort((a,b)=> nivelOrder[a.nivel] - nivelOrder[b.nivel] || new Date(a.ingresso) - new Date(b.ingresso));
-  document.getElementById('ori-list').innerHTML = lista.map(o=>{
-    const pct = Math.min(100, Math.round((o._meses/o.total)*100));
-    const restantes = Math.max(0, o.total - o._meses);
-    const defPrazo = dataDefesaPrazo(o.ingresso, o.total);
-    const qualPrazo = o.nivel !== 'Graduação' ? dataQualifPrazo(o.ingresso, o.nivel) : null;
-    return `<div class="ori-card risco-${o._risco}">
-      <div class="ori-row">
-        <div class="ori-avatar">${ini(o.nome)}</div>
-        <div style="flex:1;min-width:100px;">
-          <div class="ori-name">${o.nome}</div>
-          <div class="ori-tema">${o.tema}</div>
-        </div>
-        <div class="badges">${pBadge(o.programa)} ${rBadge(o._risco)} ${qBadge(o.qualif)}</div>
-        <button class="edit-btn" onclick="abrirModalEditar(${o.id})"><i class="ti ti-pencil" style="font-size:12px;"></i> editar</button>
+  document.getElementById('orientados-list').innerHTML = orientados.map(o=>{
+    const risco = calcRisco(o);
+    const meses = calcMeses(o.ingresso);
+    const classe = risco === 'OK' ? '' : ' risco-' + (risco === 'CRÍTICO' ? 'alto' : 'medio');
+    return `<div class="list-card${classe}" style="border-left:3px solid ${risco==='OK'?'#3B6D11':'#A32D2D'}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span style="font-weight:600;font-size:14px;">${o.nome}</span>
+        <span class="badge ${risco==='OK'?'badge-ok':'badge-risk'}">${risco}</span>
       </div>
-      <div class="progress-row">
-        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${rColor(o._risco)};"></div></div>
-        <span class="progress-label">${o._meses}/${o.total} meses · ${restantes} restantes</span>
+      <div style="font-size:12px;color:#666;margin-bottom:6px;">
+        <strong>${o.nivel}</strong> em ${o.programa} | ${meses}/${o.total} meses
       </div>
-      <div class="prazo-info">
-        <span><i class="ti ti-calendar-event"></i> Ingresso: ${o.ingresso ? new Date(o.ingresso+'T12:00:00').toLocaleDateString('pt-BR',{month:'short',year:'numeric'}) : '—'}</span>
-        ${qualPrazo ? `<span><i class="ti ti-clipboard-check"></i> Prazo qualif.: ${qualPrazo}</span>` : ''}
-        <span><i class="ti ti-flag"></i> Prazo defesa: ${defPrazo}</span>
+      <div style="font-size:12px;margin-bottom:6px;">📌 <strong>${o.tema}</strong></div>
+      <div style="font-size:11px;color:#999;">
+        Qualificação: ${o.qualif||'pendente'} | Ingresso: ${o.ingresso}
       </div>
     </div>`;
   }).join('');
 }
-
-// ─── Modal ─────────────────────────────────────────────────
-let editandoId = null;
-function abrirModalEditar(id){
-  editandoId = id;
-  const o = orientados.find(x=>x.id===id);
-  document.getElementById('modal-title-text').textContent = 'Editar Orientado';
-  document.getElementById('f-nome').value = o.nome;
-  document.getElementById('f-tema').value = o.tema;
-  document.getElementById('f-nivel').value = o.nivel === 'Graduação' ? 'Graduação' : o.nivel;
-  document.getElementById('f-programa').value = o.programa;
-  document.getElementById('f-ingresso').value = o.ingresso || '';
-  document.getElementById('f-total').value = o.total;
-  document.getElementById('f-qualif').value = o.qualif || 'ok';
-  document.getElementById('btn-deletar').style.display = '';
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function abrirModalNovo(){
-  editandoId = null;
-  document.getElementById('modal-title-text').textContent = 'Novo Orientado';
-  document.getElementById('f-nome').value = '';
-  document.getElementById('f-tema').value = '';
-  document.getElementById('f-nivel').value = 'Doutorado';
-  document.getElementById('f-programa').value = 'PETRAN';
-  document.getElementById('f-ingresso').value = '';
-  document.getElementById('f-total').value = '60';
-  document.getElementById('f-qualif').value = 'ok';
-  document.getElementById('btn-deletar').style.display = 'none';
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function fecharModal(e){ if(e.target===document.getElementById('modal-overlay')) document.getElementById('modal-overlay').classList.remove('open'); }
-
-function salvarOrientado(){
-  const dados = {
-    nome: document.getElementById('f-nome').value.trim(),
-    tema: document.getElementById('f-tema').value.trim(),
-    nivel: document.getElementById('f-nivel').value,
-    programa: document.getElementById('f-programa').value,
-    ingresso: document.getElementById('f-ingresso').value,
-    total: parseInt(document.getElementById('f-total').value),
-    qualif: document.getElementById('f-qualif').value,
-  };
-  if(!dados.nome){ toast('Preencha o nome do orientando'); return; }
-  if(editandoId){
-    const idx = orientados.findIndex(o=>o.id===editandoId);
-    orientados[idx] = {...orientados[idx], ...dados};
-  } else {
-    orientados.push({id: nextId++, ...dados, risco:'baixo'});
-  }
-  salvarLocal();
-  renderOrientados();
-  document.getElementById('modal-overlay').classList.remove('open');
-  toast(editandoId ? '✓ Orientado atualizado' : '✓ Orientado adicionado');
-}
-function deletarOrientado(){
-  if(!confirm('Remover este orientando?')) return;
-  orientados = orientados.filter(o=>o.id!==editandoId);
-  salvarLocal();
-  renderOrientados();
-  document.getElementById('modal-overlay').classList.remove('open');
-  toast('Orientado removido');
-}
-
-// ─── Exportar relatório ────────────────────────────────────
-function exportarRelatorio(){
-  // Mostrar painel de orientados e acionar print
-  showTab('orientados', document.querySelectorAll('.nav-btn')[1]);
-  filtroAtivo = 'todos';
-  renderOrientados();
-  setTimeout(()=>{ window.print(); }, 300);
-}
-
-// ─── Toast ─────────────────────────────────────────────────
-function toast(msg){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2800);
-}
-
-// ─── Regimento ─────────────────────────────────────────────
-const regimento = [
-  { titulo:'Duração dos cursos', icone:'ti-clock', itens:['Mestrado: máximo 30 meses (+3 prorrogação = 33 meses)','Doutorado: máximo 60 meses (+6 prorrogação = 66 meses)','Desligamento automático ao extrapolar prazo (Art. 30)'] },
-  { titulo:'Créditos obrigatórios', icone:'ti-school', itens:['Mestrado: mínimo 36 créditos (6 dissertação + 4 estágio + 1 inglês + 1 qualif.)','Doutorado: mínimo 68 créditos (12 tese + 8 estágio + 1 inglês + 1 qualif.)','Máximo 30 créditos aproveitados de outro programa no doutorado'] },
-  { titulo:'Exame de qualificação', icone:'ti-clipboard-check', itens:['Mestrado: requerido até 21 meses após ingresso','Doutorado: requerido até 33 meses após ingresso','Exige créditos concluídos + Seminário de Andamento apresentado','Doutorado: minuta da tese mínimo 50 páginas, sessão pública 30 min','2ª chance em até 6 meses se reprovado; 2 reprovações = desligamento'] },
-  { titulo:'Requisitos para agendar defesa', icone:'ti-award', itens:['Mestrado: publicação em anais + submissão artigo Qualis B3 ou superior','Doutorado: artigo publicado/aceito em periódico Qualis B2 ou superior','Tese/dissertação entregue à banca com 30 dias de antecedência','Banca de tese: mínimo 5 membros (2 externos); dissertação: 3 membros (1 externo)'] },
-  { titulo:'Limite de orientações (Art. 22)', icone:'ti-users', itens:['Máximo 8 alunos simultâneos em todos os programas','Máximo 4 alunos de doutorado'] },
-  { titulo:'Desligamento (Art. 30)', icone:'ti-alert-triangle', itens:['Reprovação 2x na mesma disciplina','Reprovação 1x em duas disciplinas distintas','Reprovação na defesa da tese','Extrapolação do prazo máximo','Nenhuma matrícula no semestre vigente'] },
-];
 function renderRegimento(){
-  document.getElementById('reg-content').innerHTML = regimento.map(s=>`
-    <div class="reg-card">
-      <div class="reg-title"><i class="ti ${s.icone}"></i>${s.titulo}</div>
-      <ul>${s.itens.map(i=>`<li>${i}</li>`).join('')}</ul>
-    </div>`).join('');
+  document.getElementById('regimento-content').innerHTML = `<div style="white-space:pre-line;font-size:13px;line-height:1.6;font-family:monospace;background:#f5f5f5;padding:14px;border-radius:8px;">${regimento_text}</div>`;
 }
-
-// ─── Projetos ──────────────────────────────────────────────
-const projetos = [
-  { nome:'Resistência de pavimentos em rodovias do semiárido', financiador:'FUNCAP', valor:'R$ 180k', restante:'14 meses', comp:['Pavimentação','Ensaios mecânicos','Geotecnia'] },
-  { nome:'Materiais sustentáveis para infraestrutura urbana', financiador:'CNPq', valor:'R$ 240k', restante:'22 meses', comp:['Materiais reciclados','Gestão ambiental'] },
-  { nome:'Monitoramento de estruturas de transporte — INCT', financiador:'INCT/MCTI', valor:'R$ 600k', restante:'30 meses', comp:['NDT','Caracterização','Modelagem FEA'] },
-];
 function renderProjetos(){
-  document.getElementById('proj-list').innerHTML = projetos.map(p=>`
+  document.getElementById('projetos-list').innerHTML = projetos.map(p=>`
     <div class="list-card">
       <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-        <i class="ti ti-briefcase" style="font-size:16px;color:#888;"></i>
         <span class="list-card-title">${p.nome}</span>
         <span class="badge badge-ok">${p.financiador}</span>
       </div>
@@ -597,15 +494,6 @@ function renderProjetos(){
       <div class="tag-row">${p.comp.map(c=>`<span class="badge badge-info">${c}</span>`).join('')}</div>
     </div>`).join('');
 }
-
-// ─── Editais ───────────────────────────────────────────────
-const editais = [
-  { titulo:'CNPq Universal 2025 — Pesquisa básica e aplicada', prazo:'30 Jun 2025', valor:'Até R$ 120k', area:'Engenharia / Transportes', status:'aberto' },
-  { titulo:'FUNCAP Jovem Pesquisador CE', prazo:'10 Jun 2025', valor:'Até R$ 80k', area:'Engenharia', status:'urgente' },
-  { titulo:'CAPES-COFECUB — Cooperação Franco-Brasileira', prazo:'15 Jul 2025', valor:'Bolsas doutorado', area:'Todas', status:'aberto' },
-  { titulo:'FINEP Inova Infraestrutura', prazo:'31 Ago 2025', valor:'Até R$ 2M', area:'Infraestrutura / Transportes', status:'aberto' },
-  { titulo:'ANP-PRH — Bolsas pós-graduação em energia', prazo:'20 Jun 2025', valor:'Bolsas mestrado/doutorado', area:'Energia / Materiais', status:'aberto' },
-];
 function renderEditais(){
   document.getElementById('edital-list').innerHTML = editais.map(e=>`
     <div class="list-card">
@@ -622,7 +510,7 @@ function renderEditais(){
     </div>`).join('');
 }
 
-// ─── Navegação ─────────────────────────────────────────────
+// ─── Navegação ─────────────────────────────────────────────────
 function showTab(id, btn){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -634,12 +522,13 @@ function showTab(id, btn){
   if(id==='editais') renderEditais();
 }
 
-// ─── System Prompt ─────────────────────────────────────────
+// ─── System Prompt com PPC ──────────────────────────────────────
 function buildSystem(){
   const lista = orientados.map(o=>{
     const m = calcMeses(o.ingresso);
     return `- ${o.nome} | ${o.nivel} ${o.programa} | ${m}/${o.total} meses | Ingresso: ${o.ingresso||'?'} | Risco: ${calcRisco(o)} | Qualif: ${o.qualif||'?'} | Tema: ${o.tema}`;
   }).join('\n');
+  
   return `Você é o agente científico do Laboratório de Materiais e Processos (LMP) e INCT da UFC.
 
 ═══ REGIMENTO OFICIAL DO PETRAN/UFC ═══
@@ -652,14 +541,31 @@ LIMITE ORIENTAÇÕES (Art. 22): máximo 8 simultâneos; máximo 4 doutorando.
 ═══ ORIENTADOS ATUAIS ═══
 ${lista}
 
+═══ PPC ENGENHARIA CIVIL 2022 ═══
+PERFIL DO EGRESSO: Profissional com visão holística, humanista, crítico, reflexivo, criativo e ético. Capacitado para pesquisar, desenvolver e inovar. Reconhece necessidades dos usuários. Adota perspectivas multidisciplinares. Considera aspectos socioambientais. Atua com responsabilidade social e sustentabilidade.
+
+COMPETÊNCIAS GERAIS (8):
+1. Identificar problemas e formular soluções | 2. Analisar fenômenos físicos/químicos | 3. Conceber sistemas/produtos | 4. Planejar e manter soluções
+5. Comunicar eficazmente | 6. Trabalhar em equipes multidisciplinares | 7. Aplicar ética e legislação | 8. Aprender autonomamente
+
+COMPETÊNCIAS ESPECÍFICAS (8 áreas):
+CE1-Planejamento/Construção | CE2-Mecânica Estruturas | CE3-Projeto Estruturas | CE4-Recursos Hídricos | CE5-Saneamento | CE6-Geotecnia | CE7-Transportes | CE8-Infraestrutura
+
+ÁREAS DE ATUAÇÃO: Planejamento/Construção, Mecânica Estruturas, Projeto Estruturas, Recursos Hídricos, Saneamento, Geotecnia, Planejamento/Operação Transportes, Infraestrutura Transportes
+
+PRINCÍPIOS NORTEADORES (10): Integração, interdisciplinaridade, teoria-prática, sustentabilidade, transversalidade, extensão, empreendedorismo, inovação, internacionalização
+
+ESTRUTURA CURRICULAR: 12 UCs (8 áreas + 4 integração), 5 projetos integradores, curricularização extensão 10%, estágio a partir 7º semestre
+
 ═══ SUAS CAPACIDADES ═══
 1. Analisar prazos e riscos citando artigos do regimento
 2. Calcular datas exatas a partir do ingresso real de cada aluno
-3. Identificar quem precisa fazer qualificação, publicar, cumprir créditos
+3. Identificar quem precisa de qualificação, publicar, cumprir créditos
 4. Montar cronogramas de defesa
 5. Sugerir hipóteses de pesquisa cruzando temas do grupo
 6. Recomendar editais (CNPq, CAPES, FINEP, ANP, FUNCAP)
-7. Preparar drafts de texto científico
+7. Consultar PPC Engenharia Civil: competências, áreas de atuação, estrutura curricular
+8. Preparar drafts de texto científico
 
 Responda em português. Seja analítico, direto e cite artigos quando relevante. Máximo 500 palavras.`;
 }
