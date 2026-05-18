@@ -360,24 +360,24 @@ function marcarChaveSalva(){
 }
 
 // ─── Orientados (persistidos no localStorage) ──────────────
+const DATA_VERSION = 'v3'; // incrementar aqui força reset com dados novos
+if(localStorage.getItem('lmp_data_version') !== DATA_VERSION){
+  localStorage.removeItem('lmp_orientados');
+  localStorage.setItem('lmp_data_version', DATA_VERSION);
+}
+
 function defaultOrientados(){
-  const hoje = new Date();
-  function ing(mesesAtras){
-    const d = new Date(hoje);
-    d.setMonth(d.getMonth() - mesesAtras);
-    return d.toISOString().split('T')[0];
-  }
   return [
-    { id:1, nome:'Arthur Veras',            nivel:'Graduação', programa:'—',      ingresso:ing(8),  total:12, risco:'baixo',  tema:'TCC — Engenharia Civil',                   qualif:null },
-    { id:2, nome:'Camila Carvalho',          nivel:'Doutorado', programa:'DEHA',   ingresso:ing(28), total:60, risco:'baixo',  tema:'Gestão ambiental em processos industriais', qualif:'pendente' },
-    { id:3, nome:'Jorge Luis',               nivel:'Doutorado', programa:'PETRAN', ingresso:ing(36), total:60, risco:'medio',  tema:'Infraestrutura de transportes e materiais', qualif:'devida' },
-    { id:4, nome:'Karina Lima',              nivel:'Doutorado', programa:'PETRAN', ingresso:ing(38), total:60, risco:'medio',  tema:'Pavimentação e materiais asfálticos',       qualif:'devida' },
-    { id:5, nome:'Mauro da Silva',           nivel:'Doutorado', programa:'PETRAN', ingresso:ing(44), total:60, risco:'alto',   tema:'Logística e materiais de construção',       qualif:'atrasada' },
-    { id:6, nome:'Otávio Gomes',             nivel:'Doutorado', programa:'PETRAN', ingresso:ing(30), total:60, risco:'baixo',  tema:'Geotecnia e materiais granulares',           qualif:'pendente' },
-    { id:7, nome:'Eulália Barbosa',          nivel:'Doutorado', programa:'PETRAN', ingresso:ing(24), total:60, risco:'baixo',  tema:'Gestão de resíduos em obras',               qualif:'ok' },
-    { id:8, nome:'Natasha Porto Alexandre',  nivel:'Doutorado', programa:'—',      ingresso:ing(20), total:60, risco:'baixo',  tema:'Caracterização de materiais',               qualif:'ok' },
-    { id:9, nome:'Nayara Gurjão',            nivel:'Doutorado', programa:'PETRAN', ingresso:ing(34), total:60, risco:'medio',  tema:'Materiais e estruturas de transporte',      qualif:'devida' },
-    { id:10,nome:'Haikel Gonçalves',         nivel:'Doutorado', programa:'PETRAN', ingresso:ing(18), total:60, risco:'baixo',  tema:'Tecnologia de pavimentos',                  qualif:'ok' },
+    { id:1,  nome:'Haikel Buganem Busgaib Gonçalves', nivel:'Doutorado', programa:'PETRAN', ingresso:'2023-07-01', total:60, qualif:'devida',   tema:'Road Public Works Management System Using Low-Cost Technologies and Artificial Intelligence' },
+    { id:2,  nome:'Natasha Porto Alexandre',           nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-10-01', total:60, qualif:'ok',        tema:'Avaliação da Incorporação de Materiais de Mudança de Fase Microencapsulados em Pavimentos Asfálticos' },
+    { id:3,  nome:'Karina de Lima',                    nivel:'Doutorado', programa:'PETRAN', ingresso:'2026-03-01', total:60, qualif:'ok',        tema:'Interpretação de Variações de Rigidez e de Vida de Fadiga em Ensaios Cíclicos com Repouso em Materiais Betuminosos Condicionados à Umidade' },
+    { id:4,  nome:'Nayara de Oliveira Gurjão',         nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-11-01', total:60, qualif:'ok',        tema:'Análise integrada da infraestrutura viária e de dados espaciais como suporte à proposição de soluções sustentáveis nas cidades' },
+    { id:5,  nome:'Eulália Romão Barbosa',             nivel:'Doutorado', programa:'PETRAN', ingresso:'2025-04-01', total:60, qualif:'ok',        tema:'Avaliação multiescala da mobilização do ligante em misturas asfálticas submetidas a múltiplos ciclos de reciclagem' },
+    { id:6,  nome:'Mauro José da Silva Filho',         nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-11-01', total:60, qualif:'ok',        tema:'Desenvolvimento, validação e proposição de protocolos padronizados para ensaio de Ressonância por Impacto para mistura asfáltica' },
+    { id:7,  nome:'Otávio José de Freitas Gomes',      nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-03-01', total:60, qualif:'pendente',  tema:'Desenvolvimento de técnicas de caracterização visual de materiais utilizados na pavimentação com base em ciência de dados e processamento de imagens' },
+    { id:8,  nome:'Arthur Veras Moreira',              nivel:'Graduação', programa:'—',      ingresso:'2023-03-01', total:24, qualif:null,        tema:'Integração de ACV e ACCV no Dimensionamento Mecanístico-Empírico de Pavimentos Asfálticos: Otimização de Recursos e Pegada de Carbono do CAP' },
+    { id:9,  nome:'Camila Carvalho Noberto',           nivel:'Doutorado', programa:'DEHA',   ingresso:'2024-03-01', total:60, qualif:'pendente',  tema:'Avaliação do Ciclo de Vida de Pavimentos Rodoviários com Incorporação de Resíduos de Perfuração de Poços de Petróleo em Urucu' },
+    { id:10, nome:'Aislan Nogueira Dutra',             nivel:'Mestrado',  programa:'PETRAN', ingresso:'2025-04-01', total:30, qualif:'ok',        tema:'Desenvolvimento de modelo de previsão do perfil de temperatura de pavimentos asfálticos' },
   ];
 }
 
