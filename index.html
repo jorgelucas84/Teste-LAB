@@ -360,7 +360,7 @@ function marcarChaveSalva(){
 }
 
 // ─── Orientados (persistidos no localStorage) ──────────────
-const DATA_VERSION = 'v3'; // incrementar aqui força reset com dados novos
+const DATA_VERSION = 'v4'; // incrementar aqui força reset com dados novos
 if(localStorage.getItem('lmp_data_version') !== DATA_VERSION){
   localStorage.removeItem('lmp_orientados');
   localStorage.setItem('lmp_data_version', DATA_VERSION);
@@ -375,7 +375,7 @@ function defaultOrientados(){
     { id:5,  nome:'Eulália Romão Barbosa',             nivel:'Doutorado', programa:'PETRAN', ingresso:'2025-04-01', total:60, qualif:'ok',        tema:'Avaliação multiescala da mobilização do ligante em misturas asfálticas submetidas a múltiplos ciclos de reciclagem' },
     { id:6,  nome:'Mauro José da Silva Filho',         nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-11-01', total:60, qualif:'ok',        tema:'Desenvolvimento, validação e proposição de protocolos padronizados para ensaio de Ressonância por Impacto para mistura asfáltica' },
     { id:7,  nome:'Otávio José de Freitas Gomes',      nivel:'Doutorado', programa:'PETRAN', ingresso:'2024-03-01', total:60, qualif:'pendente',  tema:'Desenvolvimento de técnicas de caracterização visual de materiais utilizados na pavimentação com base em ciência de dados e processamento de imagens' },
-    { id:8,  nome:'Arthur Veras Moreira',              nivel:'Graduação', programa:'—',      ingresso:'2023-03-01', total:24, qualif:null,        tema:'Integração de ACV e ACCV no Dimensionamento Mecanístico-Empírico de Pavimentos Asfálticos: Otimização de Recursos e Pegada de Carbono do CAP' },
+    { id:8,  nome:'Arthur Veras Moreira',              nivel:'Graduação', programa:'—',      ingresso:'2023-03-01', total:60, qualif:null,        tema:'Integração de ACV e ACCV no Dimensionamento Mecanístico-Empírico de Pavimentos Asfálticos: Otimização de Recursos e Pegada de Carbono do CAP' },
     { id:9,  nome:'Camila Carvalho Noberto',           nivel:'Doutorado', programa:'DEHA',   ingresso:'2024-03-01', total:60, qualif:'pendente',  tema:'Avaliação do Ciclo de Vida de Pavimentos Rodoviários com Incorporação de Resíduos de Perfuração de Poços de Petróleo em Urucu' },
     { id:10, nome:'Aislan Nogueira Dutra',             nivel:'Mestrado',  programa:'PETRAN', ingresso:'2025-04-01', total:30, qualif:'ok',        tema:'Desenvolvimento de modelo de previsão do perfil de temperatura de pavimentos asfálticos' },
   ];
@@ -450,7 +450,8 @@ function renderOrientados(){
   if(filtroAtivo==='PETRAN') lista = lista.filter(o=>o.programa==='PETRAN');
   else if(filtroAtivo==='DEHA') lista = lista.filter(o=>o.programa==='DEHA');
   else if(filtroAtivo==='risco') lista = lista.filter(o=>o._risco==='alto'||o._risco==='medio');
-  lista.sort((a,b)=>b._meses-a._meses);
+  const nivelOrder = {'Graduação':0,'Mestrado':1,'Doutorado':2};
+  lista.sort((a,b)=> nivelOrder[a.nivel] - nivelOrder[b.nivel] || new Date(a.ingresso) - new Date(b.ingresso));
   document.getElementById('ori-list').innerHTML = lista.map(o=>{
     const pct = Math.min(100, Math.round((o._meses/o.total)*100));
     const restantes = Math.max(0, o.total - o._meses);
@@ -472,8 +473,8 @@ function renderOrientados(){
       </div>
       <div class="prazo-info">
         <span><i class="ti ti-calendar-event"></i> Ingresso: ${o.ingresso ? new Date(o.ingresso+'T12:00:00').toLocaleDateString('pt-BR',{month:'short',year:'numeric'}) : '—'}</span>
-        <span><i class="ti ti-flag"></i> Prazo defesa: ${defPrazo}</span>
         ${qualPrazo ? `<span><i class="ti ti-clipboard-check"></i> Prazo qualif.: ${qualPrazo}</span>` : ''}
+        <span><i class="ti ti-flag"></i> Prazo defesa: ${defPrazo}</span>
       </div>
     </div>`;
   }).join('');
